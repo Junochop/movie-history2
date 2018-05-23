@@ -1,3 +1,3 @@
-const myLinks = require('./events');
+const events = require('./events');
 
-myLinks();
+events.initializer();
