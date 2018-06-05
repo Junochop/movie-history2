@@ -27,7 +27,7 @@ const myLinks = () => {
 const pressEnter = () => {
   // big old keypress event
   $(document).keypress((e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !$('#search').hasClass('hide')) {
       const searchWords = $('#searchBar').val().replace(' ', '%20');
       tmdb.showResults(searchWords);
     }
@@ -61,6 +61,26 @@ const getAllMoviesEvent = () => {
     })
     .catch((error) => {
       console.error('error in get all movies', error);
+    });
+};
+
+const getWishlistMoviesEvent = () => {
+  firebaseApi.getWishlistMovies()
+    .then((moviesArray) => {
+      dom.domString(moviesArray, tmdb.getImageConfig(), 'savedMovies', true);
+    })
+    .catch((error) => {
+      console.error('error in get all movies', error);
+    });
+};
+
+const getWatchedMovies = () => {
+  firebaseApi.getWatchedMovies()
+    .then((moviesArray) => {
+      dom.domString(moviesArray, tmdb.getImageConfig(), 'savedMovies', true);
+    })
+    .catch((error) => {
+      console.error('error in get watched movies', error);
     });
 };
 
@@ -98,6 +118,50 @@ const updateMovieEent = () => {
   });
 };
 
+const filterEvents = () => {
+  $('#filterButtons').on('click', (e) => {
+    const classList = e.target.classList;
+    if (classList.contains('wishlist')) {
+      // show only isWatched: false
+      getWishlistMoviesEvent();
+    } else if (classList.contains('watched')) {
+      // show only if isWatched: true
+      getWatchedMovies();
+    } else {
+      getAllMoviesEvent();
+    }
+  });
+};
+
+const authEvents = () => {
+  $('#sign-in').click((e) => {
+    e.preventDefault();
+    const email = $('#inputEmail').val();
+    const pass = $('#inputPassword').val();
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then((user) => {
+        $('#myMovies').removeClass('hide');
+        $('#search').addClass('hide');
+        $('#authScreen').addClass('hide');
+        getAllMoviesEvent();
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        console.error(errorMessage);
+      });
+  });
+
+  $('#register-link').click(() => {
+    $('#login-form').addClass('hide');
+    $('#registration-form').removeClass('hide');
+  });
+
+  $('#signin-link').click(() => {
+    $('#login-form').removeClass('hide');
+    $('#registration-form').addClass('hide');
+  });
+};
+
 const initializer = () => {
   myLinks();
   pressEnter();
@@ -105,20 +169,7 @@ const initializer = () => {
   deleteMovieFromFirebase();
   updateMovieEent();
   filterEvents();
-};
-
-const filterEvents = () => {
-  $('#filterButtons').on('click', (e) => {
-    const classList = e.target.classList;
-    if (classList.contains('wishlist')) {
-      //  show only isWatched: false;
-    } else if (classList.contains('watched')) {
-
-    } else {
-      //  give me everrthing
-      getAllMoviesEvent();
-    }
-  });
+  authEvents();
 };
 
 module.exports = {
