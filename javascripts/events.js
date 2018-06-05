@@ -97,7 +97,7 @@ const deleteMovieFromFirebase = () => {
   });
 };
 
-const updateMovieEent = () => {
+const updateMovieEvent = () => {
   $(document).on('click', '.updateMovieToWatched', (e) => {
     const movieToUpdateId = $(e.target).closest('.movie').data('firebaseId');
     const movieToUpdateCard = $(e.target).closest('.movie');
@@ -134,7 +134,7 @@ const filterEvents = () => {
 };
 
 const authEvents = () => {
-  $('#sign-in').click((e) => {
+  $('#signin-btn').click((e) => {
     e.preventDefault();
     const email = $('#inputEmail').val();
     const pass = $('#inputPassword').val();
@@ -151,6 +151,19 @@ const authEvents = () => {
       });
   });
 
+  $('#register-btn').click(() => {
+    const email = $('#registerEmail').val();
+    const pass = $('#registerPassword').val();
+    firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .catch((error) => {
+        // Handle Errors here.
+
+        const errorMessage = error.message;
+        console.error(errorMessage);
+        // ...
+      });
+  });
+
   $('#register-link').click(() => {
     $('#login-form').addClass('hide');
     $('#registration-form').removeClass('hide');
@@ -160,6 +173,15 @@ const authEvents = () => {
     $('#login-form').removeClass('hide');
     $('#registration-form').addClass('hide');
   });
+
+  $('#logout').click(() => {
+    firebase.auth().signOut().then(() => {
+    }).catch((error) => {
+      // An error happened.
+      console.error(error);
+    });
+  });
+
 };
 
 const initializer = () => {
@@ -167,11 +189,12 @@ const initializer = () => {
   pressEnter();
   saveMovieToWishlistEvent();
   deleteMovieFromFirebase();
-  updateMovieEent();
+  updateMovieEvent();
   filterEvents();
   authEvents();
 };
 
 module.exports = {
   initializer,
+  getAllMoviesEvent,
 };
