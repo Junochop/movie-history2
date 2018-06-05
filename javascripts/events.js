@@ -139,9 +139,28 @@ const authEvents = () => {
     const email = $('#inputEmail').val();
     const pass = $('#inputPassword').val();
     firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then((user) => {
+        $('#myMovies').removeClass('hide');
+        $('#search').addClass('hide');
+        $('#authScreen').addClass('hide');
+        getAllMoviesEvent();
+      })
       .catch((error) => {
         const errorMessage = error.message;
         console.error(errorMessage);
+      });
+  });
+
+  $('#register-btn').click(() => {
+    const email = $('#registerEmail').val();
+    const pass = $('#registerPassword').val();
+    firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .catch((error) => {
+        // Handle Errors here.
+
+        const errorMessage = error.message;
+        console.error(errorMessage);
+        // ...
       });
   });
 
@@ -162,6 +181,7 @@ const authEvents = () => {
       console.error(error);
     });
   });
+
 };
 
 const initializer = () => {
